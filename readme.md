@@ -18,10 +18,14 @@ A robust and scalable Task Management API built with Go, Gin, and PostgreSQL. Th
 - Go 1.18 or higher
 - PostgreSQL 12 or higher
 - Git
+- Docker 20.10+ and Docker Compose 1.29+
 
-## Getting Started
+## Prerequisites
 
-### 1. Clone the repository
+- Go 1.18 or higher
+- PostgreSQL 12 or higher
+- Git
+- Docker 20.10+ and Docker Compose 1.29+
 
 ```bash
 git clone https://github.com/yourusername/task-management-api.git
@@ -35,10 +39,18 @@ Create a `.env` file in the root directory with the following variables:
 ```env
 # Server
 PORT=8080
+ENVIRONMENT=development
 
 # Database
-CONNECTION_STRING=postgres://username:password@localhost:5432/tasks_db?sslmode=disable
-AUTO_MIGRATE=false
+DB_HOST=db
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=tasks_db
+DB_SSLMODE=disable
+
+# Auto Migration
+AUTO_MIGRATE=true
 ```
 
 ### 3. Install dependencies
@@ -54,6 +66,52 @@ go run cmd/main.go
 ```
 
 The API will be available at `http://localhost:8080`
+
+## Docker Compose Files
+
+- `docker-compose.yml`: Base configuration with common services
+- `docker-compose.dev.yml`: Development environment with hot-reloading
+- `docker-compose.prod.yml`: Production-optimized configuration
+
+### Development Commands
+
+- Start development environment:
+  ```bash
+  docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+  ```
+
+- View logs:
+  ```bash
+  docker-compose logs -f
+  ```
+
+- Stop services:
+  ```bash
+  docker-compose down
+  ```
+
+### Production Commands
+
+- Start production environment:
+  ```bash
+  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+  ```
+
+- View logs:
+  ```bash
+  docker-compose logs -f
+  ```
+
+- Stop services:
+  ```bash
+  docker-compose down
+  ```
+
+- Update the application:
+  ```bash
+  git pull
+  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+  ```
 
 ## API Endpoints
 
