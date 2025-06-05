@@ -37,21 +37,29 @@ cd task-management-api
 Create a `.env` file in the root directory with the following variables:
 
 ```env
-# Server
+# Server Configuration
 PORT=8080
-ENVIRONMENT=development
 
-# Database
-DB_HOST=db
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=tasks_db
-DB_SSLMODE=disable
+# Database Configuration
+CONNECTION_STRING=postgres://username:password@localhost:5432/tasks_db?sslmode=disable
 
 # Auto Migration
-AUTO_MIGRATE=true
+AUTO_MIGRATE=false
 ```
+
+#### Configuration Details:
+
+- `PORT`: The port on which the application will run (default: 8080)
+- `CONNECTION_STRING`: PostgreSQL connection string in the format: 
+  ```
+  postgres://username:password@host:port/database_name?sslmode=disable
+  ```
+- `AUTO_MIGRATE`: Set to `true` to automatically run database migrations on startup (default: false)
+
+For production, make sure to:
+1. Use proper database credentials
+2. Set `AUTO_MIGRATE` to `false` after initial setup
+3. Consider enabling SSL in the connection string for production use
 
 ### 3. Install dependencies
 
