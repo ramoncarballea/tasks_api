@@ -12,6 +12,7 @@ const (
 	ConnectionString string = "CONNECTION_STRING"
 	AutoMigrate      string = "AUTO_MIGRATE"
 	Port             string = "PORT"
+	Host             string = "HOST"
 )
 
 type DataBaseConfig struct {
@@ -20,6 +21,7 @@ type DataBaseConfig struct {
 }
 
 type ServerConfig struct {
+	Host string
 	Port string
 }
 
@@ -43,6 +45,7 @@ func NewServerConfig() *ServerConfig {
 
 	return &ServerConfig{
 		Port: os.Getenv(Port),
+		Host: os.Getenv(Host),
 	}
 }
 

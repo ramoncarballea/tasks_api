@@ -15,9 +15,30 @@ import (
 	"go.uber.org/zap"
 	"tasks.com/config/database"
 	"tasks.com/config/environment"
+	"tasks.com/config/swagger"
+	_ "tasks.com/docs" // Import docs for Swagger
 	"tasks.com/modules/task"
 )
 
+// @title           Swagger Example API
+// @version         1.0
+// @description     This is a sample server celler server.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.basic  BasicAuth
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func BuildApp() *fx.App {
 	return fx.New(
 		environment.ProvideEnvironment(),
@@ -34,12 +55,15 @@ func BuildApp() *fx.App {
 			return &fxevent.ZapLogger{Logger: log}
 		}),
 		fx.Invoke(autoMigrate),
+		fx.Invoke(swagger.SetupSwagger),
 		fx.Invoke(routes.ProvideBaseHandlers),
 		fx.Invoke(newHttpServer),
 	)
 }
 
 func newHttpServer(lc fx.Lifecycle, handler *gin.Engine, log *zap.Logger, config *environment.ServerConfig) *http.Server {
+	// Setup Swagger
+	log.Info("Swagger documentation available at /swagger/index.html")
 	addr := fmt.Sprintf(":%s", config.Port)
 
 	server := &http.Server{

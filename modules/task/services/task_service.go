@@ -24,7 +24,7 @@ func NewTaskService(r abstractRepositories.TaskRepository, log *zap.Logger) abst
 
 func (s *taskService) ListTasks(pageNumber, pageSize uint) (*baseDto.PagedResponse[dto.ListTaskDto], error) {
 	s.log.Info("listing tasks with", zap.Uint("page_number", pageNumber), zap.Uint("page_size", pageSize))
-	tasks, total, err := s.r.GetAll(pageSize, pageSize*pageNumber)
+	tasks, total, err := s.r.GetAll(pageSize, pageSize*(pageNumber-1))
 	if err != nil {
 		s.log.Error("error while getting tasks", zap.Error(err))
 		return nil, err
