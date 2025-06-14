@@ -4,6 +4,7 @@ import (
 	"tasks.com/config/database"
 	"tasks.com/modules/task/domain/models"
 	abstractRepositories "tasks.com/modules/task/domain/repositories"
+	"time"
 )
 
 type taskRepository struct {
@@ -83,17 +84,15 @@ func (r *taskRepository) Add(task models.Task) (uint, error) {
 	query := `INSERT INTO "tasks" (name,
 								   description,
 		                           expires_at,
-								   created_at,
-								   updated_at)
-              VALUES ($1, $2, $3, $4, $5) returning "id"`
+								   created_at)
+              VALUES ($1, $2, $3, $4) returning "id"`
 
 	var id uint
 	err = db.QueryRow(query,
 		task.Name,
 		task.Description,
 		task.ExpiresAt,
-		task.CreatedAt,
-		task.UpdatedAt).Scan(&id)
+		time.Now()).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -126,6 +125,48 @@ func (r *taskRepository) Delete(id uint) error {
 
 	command := `DELETE FROM "tasks" WHERE id = $1`
 	_, err = db.Exec(command, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *taskRepository) AddRange(tasks []models.Task) error {
+	db, err := r.conn.Open()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	for _, task := range tasks {
+		query := `INSERT INTO "tasks" (name,
+								   description,
+		                           expires_at,
+								   created_at)
+              VALUES ($1, $2, $3, $4) returning "id"`
+
+		_, err = tx.Exec(query,
+			task.Name,
+			task.Description,
+			task.ExpiresAt,
+			time.Now())
+		if err != nil {
+			txErr := tx.Rollback()
+			if txErr != nil {
+				return txErr
+			}
+
+			return err
+		}
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return err
 	}

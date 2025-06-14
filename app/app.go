@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"tasks.com/config/cache"
 	"tasks.com/modules/base/routes"
+	"tasks.com/modules/identity"
+	"tasks.com/utils/seeds"
 
 	"net/http"
 
@@ -16,7 +18,7 @@ import (
 	"tasks.com/config/database"
 	"tasks.com/config/environment"
 	"tasks.com/config/swagger"
-	_ "tasks.com/docs" // Import docs for Swagger
+	_ "tasks.com/docs"
 	"tasks.com/modules/task"
 )
 
@@ -51,10 +53,12 @@ func BuildApp() *fx.App {
 			zap.NewExample,
 		),
 		task.ProvideTaskModule(),
+		identity.ProvideIdentityModule(),
 		fx.WithLogger(func(log *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{Logger: log}
 		}),
 		fx.Invoke(autoMigrate),
+		seeds.ProvideSeedsModule(),
 		fx.Invoke(swagger.SetupSwagger),
 		fx.Invoke(routes.ProvideBaseHandlers),
 		fx.Invoke(newHttpServer),

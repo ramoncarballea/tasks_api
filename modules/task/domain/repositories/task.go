@@ -22,6 +22,7 @@ type TaskRepository interface {
 	//
 	// If an error occurs while adding the task, Add returns 0 and the error.
 	Add(task models.Task) (uint, error)
+	AddRange(tasks []models.Task) error
 	// Update updates a task in the database.
 	//
 	// If an error occurs while updating the task, Update returns the error.
